@@ -102,7 +102,6 @@ void moveShipRight(uint8_t row, uint8_t col){
 
     set_color(GREEN, BLACK);
     set_cursor(player.row, player.col);
-    delay_ms(40);
     puts(player.sprites);
     set_cursor(player.row, player.col-1);
     put_char(255);
@@ -119,7 +118,6 @@ void moveShipLeft(uint8_t row, uint8_t col){
 
     set_color(GREEN, BLACK);
     set_cursor(player.row, player.col);
-    delay_ms(40);
     puts(player.sprites);
     set_cursor(player.row, player.col+3);
     put_char(255);
@@ -127,37 +125,37 @@ void moveShipLeft(uint8_t row, uint8_t col){
     setShipPosition(player.row, player.col);
 }
 
-void initSprites(uint8_t row, uint8_t col, bool goingRight){
-    struct Enemy1 enemy1[2];
-    for (uint8_t i = 0; i < 2; i++){
-        enemy1[i].row = row;
-        enemy1[i].col = col*i*2;
-        enemy1[i].sprites = "\x5\x6\x7";
-    }
-    uint8_t f, b;
-    get_color(&f, &b);
+// void initSprites(uint8_t row, uint8_t col, bool goingRight){
+//     struct Enemy1 enemy1[2];
+//     for (uint8_t i = 0; i < 2; i++){
+//         enemy1[i].row = row;
+//         enemy1[i].col = col*i*2;
+//         enemy1[i].sprites = "\x5\x6\x7";
+//     }
+//     uint8_t f, b;
+//     get_color(&f, &b);
 
-    for (uint8_t i = 0; i < 2; i++){
-        if (goingRight){
-            set_color(WHITE, BLACK);
-            set_cursor(enemy1[i].row, enemy1[i].col);
-            delay_ms(200);
-            puts(enemy1[i].sprites);
-            set_cursor(enemy1[i].row, enemy1[i].col-1);
-            put_char(255);
-            set_color(f, b);
+//     for (uint8_t i = 0; i < 2; i++){
+//         if (goingRight){
+//             set_color(WHITE, BLACK);
+//             set_cursor(enemy1[i].row, enemy1[i].col);
+//             //delay_ms(200);
+//             puts(enemy1[i].sprites);
+//             set_cursor(enemy1[i].row, enemy1[i].col-1);
+//             put_char(255);
+//             set_color(f, b);
             
-        }else{
-            set_color(WHITE, BLACK);
-            set_cursor(enemy1[i].row, enemy1[i].col);
-            delay_ms(200);
-            puts(enemy1[i].sprites);
-            set_cursor(enemy1[i].row, enemy1[i].col+3);
-            put_char(255);
-            set_color(f, b);
-        }
-    }
-}
+//         }else{
+//             set_color(WHITE, BLACK);
+//             set_cursor(enemy1[i].row, enemy1[i].col);
+//             //delay_ms(200);
+//             puts(enemy1[i].sprites);
+//             set_cursor(enemy1[i].row, enemy1[i].col+3);
+//             put_char(255);
+//             set_color(f, b);
+//         }
+//     }
+// }
 
 void shootBullet(uint8_t row, uint8_t col){
     struct Bullet bullet;
@@ -169,7 +167,7 @@ void shootBullet(uint8_t row, uint8_t col){
 
     set_color(YELLOW, BLACK);
     set_cursor(bullet.row, bullet.col);
-    delay_ms(200);
+    //delay_ms(200);
     puts(bullet.sprite);
     set_cursor(bullet.row+1, bullet.col);
     put_char(255);
@@ -192,33 +190,40 @@ uint8_t getShipCol(){
 }
 
 
-// void initSprites(uint8_t row, uint8_t col, bool goingRight){
-//     struct Enemy1 enemy1;
-//     enemy1.row = row;
-//     enemy1.col = col;
-//     enemy1.sprites = "\x5\x6\x7";
+void initSprites(uint8_t row, uint8_t col, bool goingRight){
+    struct Enemy1 enemy1;
+    enemy1.row = row;
+    enemy1.col = col;
+    enemy1.sprites = "\x5\x6\x7";
     
-//     uint8_t f, b;
-//     get_color(&f, &b);
+    uint8_t f, b;
+    get_color(&f, &b);
 
-//     if (goingRight){
-//         set_color(WHITE, BLACK);
-//         set_cursor(enemy1.row, enemy1.col);
-//         delay_ms(200);
-//         puts(enemy1.sprites);
-//         set_cursor(enemy1.row, enemy1.col-1);
-//         put_char(255);
-//         set_color(f, b);
-//     }else if (!goingRight){
-//         set_color(WHITE, BLACK);
-//         set_cursor(enemy1.row, enemy1.col);
-//         delay_ms(200);
-//         puts(enemy1.sprites);
-//         set_cursor(enemy1.row, enemy1.col+3);
-//         put_char(255);
-//         set_color(f, b);
-//     }
-// }
+    if (goingRight){
+        set_color(WHITE, BLACK);
+        set_cursor(enemy1.row, enemy1.col-1);
+        put_char(255);
+        set_cursor(enemy1.row, enemy1.col);
+        puts(enemy1.sprites);
+        set_color(f, b);
+        if (enemy1.col == 10){
+            set_cursor(enemy1.row-1, enemy1.col+1);
+            puts("\xff\xff\xff");
+        } 
+    }else if (!goingRight){
+        set_color(WHITE, BLACK);
+        set_cursor(enemy1.row, enemy1.col+3);
+        put_char(255);
+        set_cursor(enemy1.row, enemy1.col);
+        puts(enemy1.sprites);
+        if (enemy1.col == 20){
+            set_cursor(enemy1.row-1, enemy1.col-1);
+            puts("\xff\xff\xff");
+        }
+        set_color(f, b);
+        
+    }
+}
 
 // void displayLives(){
 //     set_color(RED, BLACK);
