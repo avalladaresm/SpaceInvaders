@@ -1,6 +1,8 @@
 #include "../include/screen.h"
 #include "../include/keypad.h"
 
+#define TO_STR(ch) ( ( ((ch) >= 0 ) && ((ch) <= 9) )? (48 + (ch)) : ('a' + ((ch) - 10)) )
+
 struct Player{
     uint8_t row;
     uint8_t col;
@@ -10,6 +12,7 @@ struct Player{
 struct Enemy1{
     uint8_t row;
     uint8_t col;
+    bool isDestroyed;
     char *sprites;
 };
 
@@ -17,22 +20,18 @@ struct Bullet{
     uint8_t row;
     uint8_t col;
     char *sprite;
-};
+} bullet;
 
 struct shipPosition{
     uint8_t row;
     uint8_t col;
 };
 
-
-void displayScore(){
-    set_color(WHITE, BLACK);
-    set_cursor(1, 2);
-    for(int i = 21; i < 31; i++)
-    {
-        put_char(i);
-    }
-}
+struct bulletPosition{
+    uint8_t row;
+    uint8_t col;
+    bool ifImpact;
+};
 
 void menu(){
     uint8_t f, b;
@@ -105,6 +104,8 @@ void moveShipRight(uint8_t row, uint8_t col){
     puts(player.sprites);
     set_cursor(player.row, player.col-1);
     put_char(255);
+    set_cursor(player.row, player.col-2);
+    put_char(255);
     set_color(f, b);
     setShipPosition(player.row, player.col);
 }
@@ -121,44 +122,116 @@ void moveShipLeft(uint8_t row, uint8_t col){
     puts(player.sprites);
     set_cursor(player.row, player.col+3);
     put_char(255);
+    set_cursor(player.row, player.col+4);
+    put_char(255);
     set_color(f, b);
     setShipPosition(player.row, player.col);
 }
 
-// void initSprites(uint8_t row, uint8_t col, bool goingRight){
-//     struct Enemy1 enemy1[2];
-//     for (uint8_t i = 0; i < 2; i++){
-//         enemy1[i].row = row;
-//         enemy1[i].col = col*i*2;
-//         enemy1[i].sprites = "\x5\x6\x7";
-//     }
-//     uint8_t f, b;
-//     get_color(&f, &b);
+void initSprites(uint8_t row, uint8_t col, bool goingRight){
+    struct Enemy1 enemy1[5];
+    struct Enemy1 enemy2[5];
+    struct Enemy1 enemy3[5];
 
-//     for (uint8_t i = 0; i < 2; i++){
-//         if (goingRight){
-//             set_color(WHITE, BLACK);
-//             set_cursor(enemy1[i].row, enemy1[i].col);
-//             //delay_ms(200);
-//             puts(enemy1[i].sprites);
-//             set_cursor(enemy1[i].row, enemy1[i].col-1);
-//             put_char(255);
-//             set_color(f, b);
-            
-//         }else{
-//             set_color(WHITE, BLACK);
-//             set_cursor(enemy1[i].row, enemy1[i].col);
-//             //delay_ms(200);
-//             puts(enemy1[i].sprites);
-//             set_cursor(enemy1[i].row, enemy1[i].col+3);
-//             put_char(255);
-//             set_color(f, b);
-//         }
-//     }
-// }
+    uint8_t basePositions1[] = {col, col+12, col+24, col+36, col+48};
+    uint8_t basePositions2[] = {col+4, col+16, col+28, col+40, col+52};
+    uint8_t basePositions3[] = {col+8, col+20, col+32, col+44, col+56};
+
+    for (uint8_t i = 0; i < 5; i++){
+        enemy1[i].row = row;
+        enemy1[i].col = basePositions1[i];
+        enemy1[i].isDestroyed = false;
+        enemy1[i].sprites = "\x5\x6\x7";
+
+        enemy2[i].row = row+2;
+        enemy2[i].col = basePositions2[i];
+        enemy2[i].isDestroyed = false;
+        enemy2[i].sprites = "\x19\xb\xc";
+
+        enemy3[i].row = row+4;
+        enemy3[i].col = basePositions3[i];
+        enemy3[i].isDestroyed = false;
+        enemy3[i].sprites = "\x10\x11\x12";
+    }
+    uint8_t f, b;
+    get_color(&f, &b);
+
+    for (uint8_t i = 0; i < 5; i++){
+        if (enemy1[i].isDestroyed){
+            set_cursor(4, 40);
+            puts("asdasd"); //hacer funcion
+            continue;
+        }else{
+            if (goingRight){
+                set_color(WHITE, BLACK);
+                set_cursor(enemy1[i].row, enemy1[i].col-1);
+                put_char(255);
+                set_cursor(enemy1[i].row, enemy1[i].col);
+                puts(enemy1[i].sprites);
+
+                set_cursor(enemy2[i].row, enemy2[i].col-1);
+                put_char(255);
+                set_cursor(enemy2[i].row, enemy2[i].col);
+                puts(enemy2[i].sprites);
+
+                set_cursor(enemy3[i].row, enemy3[i].col-1);
+                put_char(255);
+                set_cursor(enemy3[i].row, enemy3[i].col);
+                puts(enemy3[i].sprites);
+                set_color(f, b);
+                for (uint8_t j = 0; j < 5; j++){
+                    if (enemy1[j].col == 5 || enemy1[j].col == col + 5){
+                        set_cursor(enemy1[i].row-1, enemy1[i].col+1);
+                        puts("\xff\xff\xff");
+                        set_cursor(enemy2[i].row-1, enemy2[i].col+1);
+                        puts("\xff\xff\xff");
+                        set_cursor(enemy3[i].row-1, enemy3[i].col+1);
+                        puts("\xff\xff\xff");
+                    }
+                }
+                if (enemy1[i].row == getBulletRow() && 
+                    (enemy1[i].col == getBulletCol() || 
+                    enemy1[i].col+1 == getBulletCol() ||
+                    enemy1[i].col+2 == getBulletCol())){
+                    enemy1[i].isDestroyed = true;
+                    set_cursor(5, 40);
+                    puts("HIT"); //hacer funcion
+                }
+            }
+            else{
+                set_color(WHITE, BLACK);
+                set_cursor(enemy1[i].row, enemy1[i].col+3);
+                put_char(255);
+                set_cursor(enemy1[i].row, enemy1[i].col);
+                puts(enemy1[i].sprites);
+
+                set_cursor(enemy2[i].row, enemy2[i].col+3);
+                put_char(255);
+                set_cursor(enemy2[i].row, enemy2[i].col);
+                puts(enemy2[i].sprites);
+
+                set_cursor(enemy3[i].row, enemy3[i].col+3);
+                put_char(255);
+                set_cursor(enemy3[i].row, enemy3[i].col);
+                puts(enemy3[i].sprites);
+
+                for (uint8_t j = 0; j < 5; j++){
+                    if (enemy1[j].col == 12 || enemy1[j].col == col + 5){
+                        set_cursor(enemy1[i].row-1, enemy1[i].col-1);
+                        puts("\xff\xff\xff");
+                        set_cursor(enemy2[i].row-1, enemy2[i].col-1);
+                        puts("\xff\xff\xff");
+                        set_cursor(enemy3[i].row-1, enemy3[i].col-1);
+                        puts("\xff\xff\xff");
+                    }
+                }
+            }
+        }
+    }
+    set_color(f, b);
+}
 
 void shootBullet(uint8_t row, uint8_t col){
-    struct Bullet bullet;
     bullet.row = row;
     bullet.col = col;
     bullet.sprite = "\x1";
@@ -166,12 +239,12 @@ void shootBullet(uint8_t row, uint8_t col){
     get_color(&f, &b);
 
     set_color(YELLOW, BLACK);
-    set_cursor(bullet.row, bullet.col);
-    //delay_ms(200);
+    set_cursor(bullet.row--, bullet.col);
     puts(bullet.sprite);
-    set_cursor(bullet.row+1, bullet.col);
+    set_cursor(bullet.row+2, bullet.col);
     put_char(255);
     set_color(f, b);
+    setBulletPosition(bullet.row, bullet.col);
 }
 
 void setShipPosition(uint8_t row, uint8_t col){
@@ -180,8 +253,6 @@ void setShipPosition(uint8_t row, uint8_t col){
 }
 
 uint8_t getShipRow(){
-    set_cursor(10, 15);
-    puts("Key sdsdd");
     return player.row;
 }
 
@@ -189,156 +260,53 @@ uint8_t getShipCol(){
     return player.col;
 }
 
-
-void initSprites(uint8_t row, uint8_t col, bool goingRight){
-    struct Enemy1 enemy1;
-    enemy1.row = row;
-    enemy1.col = col;
-    enemy1.sprites = "\x5\x6\x7";
-    
-    uint8_t f, b;
-    get_color(&f, &b);
-
-    if (goingRight){
-        set_color(WHITE, BLACK);
-        set_cursor(enemy1.row, enemy1.col-1);
-        put_char(255);
-        set_cursor(enemy1.row, enemy1.col);
-        puts(enemy1.sprites);
-        set_color(f, b);
-        if (enemy1.col == 10){
-            set_cursor(enemy1.row-1, enemy1.col+1);
-            puts("\xff\xff\xff");
-        } 
-    }else if (!goingRight){
-        set_color(WHITE, BLACK);
-        set_cursor(enemy1.row, enemy1.col+3);
-        put_char(255);
-        set_cursor(enemy1.row, enemy1.col);
-        puts(enemy1.sprites);
-        if (enemy1.col == 20){
-            set_cursor(enemy1.row-1, enemy1.col-1);
-            puts("\xff\xff\xff");
-        }
-        set_color(f, b);
-        
-    }
+void setBulletPosition(uint8_t row, uint8_t col){
+    bullet.row = row;
+    bullet.col = col;
 }
 
-// void displayLives(){
-//     set_color(RED, BLACK);
-//     set_cursor(1, 70);
-//     put_char(3);
-//     put_char(3);
-// }
+uint8_t getBulletRow(){
+    return bullet.row;
+}
 
-// void displayShip(uint8_t col){
-//     set_color(GREEN, BLACK);
-//     set_cursor(27, col);
-//     int row = 26; //fixed initial row position for ship bullet
+uint8_t getBulletCol(){
+    return bullet.col;
+}
+
+void displayScore(uint8_t score){
+    set_cursor(1, 1);
+    set_color(WHITE, BLACK);
+    puts("Score");
+    uint8_t f, b;
+    get_color(&f, &b);
     
-//     put_char(4);    
-//     put_char(5);
-//     put_char(5);
-//     put_char(6);
-//     put_char(7);
-//     put_char(5);
-//     put_char(5);
-//     put_char(8);
+    set_color(GREEN, BLACK);
+    set_cursor(1, 7);
+    put_char(TO_STR(score & 0xf));
+}
+
+void displayLives(uint8_t lives){
+    set_cursor(1, 60);
+    set_color(WHITE, BLACK);
+    puts("Lives");
+    uint8_t f, b;
+    get_color(&f, &b);
     
-//     set_cursor(28, 35);
-//     for(int i = 0; i < 8; i++)
-//     {
-//         put_char(9);
-//     }
-
-//     while(col != 1){
-//         if(keypad_getkey() != 0){
-//             switch (keypad_getkey())
-//             {
-//             case 1:
-//                 col--;
-//                 set_cursor(27, col);
-//                 delay_ms(40);
-//                 put_char(255);
-//                 put_char(4);
-//                 put_char(5);
-//                 put_char(5);
-//                 put_char(6);
-//                 put_char(7);
-//                 put_char(5);
-//                 put_char(5);
-//                 put_char(8);
-//                 put_char(255);
-
-//                 set_cursor(28, col);
-//                 put_char(255);
-//                 for(int i = 0; i < 8; i++)
-//                 {
-//                     put_char(9);
-//                 }
-//                 put_char(255);
-                
-//                 if (col == 1) {
-//                     col = 1;
-//                 }
-                
-//                 break;
-//             case 2:
-//                 col++;
-//                 set_cursor(27, col);
-//                 delay_ms(40);
-//                 put_char(255);
-//                 put_char(4);
-//                 put_char(5);
-//                 put_char(5);
-//                 put_char(6);
-//                 put_char(7);
-//                 put_char(5);
-//                 put_char(5);
-//                 put_char(8);
-//                 put_char(255);
-
-//                 set_cursor(28, col);
-//                 put_char(255);
-//                 for(int i = 0; i < 8; i++)
-//                 {
-//                     put_char(9);
-//                 }
-//                 put_char(255);
-                
-//                 if (col == 1) {
-//                     col = 1;
-//                 }
-//                 break;
-//             case 8:
-//                 //displayShipBullet(row, col+3);
-//                 while(row != 2){
-//                     displayShipBullet(--row, col+3);
-//                     delay_ms(50);
-//                 }
-//                 row = 26;
-                
-//                 break;
-//             default:
-//                 break;
-//             }
-//         }
-//     }
-// }
-
-// void displayShipBullet(uint8_t row, uint8_t col){
-//     set_color(YELLOW, BLACK);
-//     set_cursor(row, col);
-//     put_char(1);
-//     put_char(2);
-//     set_cursor(row+1, col);
-//     put_char(255);
-//     put_char(255);
-//     if (row == 2) {
-//         set_cursor(row, col);
-//         put_char(255);
-//         put_char(255);
-//     }
-    
-// }
+    set_color(GREEN, BLACK);
+    if (lives == 2) {
+        set_cursor(1, 66);
+        puts("\x2\x3\x4");
+        set_cursor(1, 70);
+        puts("\x2\x3\x4");
+    } else if(lives == 1){
+        set_cursor(1, 66);
+        puts("\x2\x3\x4");
+        set_cursor(1, 70);
+        puts("\xff\xff\xff");
+    } else if(lives == 0){
+        set_cursor(1, 66);
+        puts("\xff\xff\xff");
+        set_cursor(1, 70);
+        puts("\xff\xff\xff");
+    }
+}

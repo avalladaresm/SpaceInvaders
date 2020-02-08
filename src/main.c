@@ -8,34 +8,58 @@ int main() {
     uint8_t r = 28;
     uint8_t c = 40;
     uint8_t enemyR = 3;
-    uint8_t enemyC = 10;
-    uint8_t bulletR = getShipRow();
-    uint8_t bulletC = getShipCol();
+    uint8_t enemyC = 5;
+    uint8_t bulletR = 0;
+    uint8_t bulletC = 0;
+    uint8_t bulletCBeforeMoving = 0;
     uint8_t points = 0;
-
+    uint8_t lives = 2;
+    uint8_t score = 0;
     bool goingRight = true;
+    bool isShooting = false;
+    bool isPlayerMoving = false;
+    bool isBulletGone = true;
+
     keypad_init();
     menu();
     while (1) {
         uint8_t k = keypad_getkey();
-        if (k == 6){
+        if(k==7){
+            break;
+        }
+        else if (k == 6){
             clear_screen();
             while (1){
                 uint8_t key = keypad_getkey();
-                //displayTest();
-                set_cursor(1, 1);
-                puts("Points: ");
-                
-                if (enemyC == 20){
+                displayScore(score);
+                displayLives(lives);
+
+                if (enemyC == 12){
                     goingRight = false;
                     enemyR++;
-                }else if(enemyC == 10){
+                }else if(enemyC == 5){
                     goingRight = true;
                     enemyR++;
-                    if (enemyR == 28){
-                        set_cursor(15, 40);
-                        puts("Game over1"); //hacer funcion
+                    if (enemyR == 24){
+                        lives--;
+                        if (lives == 0){
+                            delay_ms(500);
+                            clear_screen();
+                            set_cursor(13, 35);
+                            set_color(RED, BLACK);
+                            puts("Game over"); 
+                            set_cursor(14, 36);
+                            set_color(WHITE, BLACK);
+                            puts("Score"); 
+                            set_cursor(14, 42);
+                            put_char(TO_STR(score & 0xf));
+                            break;
+                        }
+                        delay_ms(1500);
+                        enemyR = 10;
                     }
+                            set_cursor(16, 77);
+                            put_char(TO_STR(lives & 0xf));
                 }
 
                 if (goingRight){
@@ -44,44 +68,54 @@ int main() {
                     initSprites(enemyR, enemyC--, goingRight);
                 }
 
-                // set_cursor(2, 1);
-                // put_char(TO_STR(key & 0xf));
-                // set_cursor(3, 1);
-                // put_char(TO_STR((key & 0xf0) >> 4));
+                if (isShooting){
+                    if (isPlayerMoving){
+                        shootBullet(bulletR--, bulletCBeforeMoving);
+                        set_cursor(16, 70);
+                        put_char(178);
+                        if (bulletR == 0){
+                            isShooting = false;
+                            isBulletGone = true;
+                        }
+                        if (isBulletGone == true){
+                            set_cursor(1, bulletCBeforeMoving);
+                            put_char(255);
+                            set_cursor(17, 70);
+                            put_char(179);
+                        }
+                    }
+                }
 
                 if (key == 1){
-                    c--;
-                    if (c == 1){
-                        c++;
+                    isPlayerMoving = true;
+                    c-=2;
+                    if (c == 2){
+                        c+=2;
                     }
                     moveShipLeft(r,c);
                 }
                 if (key == 2){
-                    c++;
-                    if (c == 76){
-                        c--;
+                    isPlayerMoving = true;
+                    c+=2;
+                    if (c == 74){
+                        c-=2;
                     }
                     moveShipRight(r,c);
                 }
                 if (key == 7){
                     points++;
-                    set_cursor(4, 9);
-                    put_char(TO_STR(points & 0xf));
                 }
-                if (key == 8){
-                    bulletR--;
-                    if (bulletR == 1){
-                        bulletR++;
+                if (key == 8 && !isShooting){
+                    isShooting = true;
+                    bulletR = getShipRow()-2;                    
+                    bulletCBeforeMoving = getShipCol()+1;
+                    if (isBulletGone){
+                        isBulletGone = false;
                     }
-                    set_cursor(12, 60);
-                    put_char(TO_STR((bulletR & 0xf0) >> 4));
-                    shootBullet(bulletR,bulletC);
                 }
-
                 delay_ms(50);
             }
         }
-        
     }
     
     return 0;
