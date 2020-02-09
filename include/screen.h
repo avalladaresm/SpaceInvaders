@@ -46,8 +46,10 @@ uint8_t getShipCol();
 void setBulletPosition(uint8_t row, uint8_t col);
 uint8_t getBulletRow();
 uint8_t getBulletCol();
+
 void displayLives(uint8_t lives);
 void displayScore(uint8_t score);
+uint8_t getDestroyedEnemies();
 
 #endif
 

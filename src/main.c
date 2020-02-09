@@ -10,9 +10,7 @@ int main() {
     uint8_t enemyR = 3;
     uint8_t enemyC = 5;
     uint8_t bulletR = 0;
-    uint8_t bulletC = 0;
     uint8_t bulletCBeforeMoving = 0;
-    uint8_t points = 0;
     uint8_t lives = 2;
     uint8_t score = 0;
     bool goingRight = true;
@@ -31,12 +29,30 @@ int main() {
             clear_screen();
             while (1){
                 uint8_t key = keypad_getkey();
+                score = getDestroyedEnemies();
                 displayScore(score);
                 displayLives(lives);
 
-                if (enemyC == 12){
+                //If score = 15, game is won. It can be lowered to
+                //score > 0 for testing purposes.
+                if (score == 15){
+                    delay_ms(500);
+                    clear_screen();
+                    set_cursor(13, 37);
+                    set_color(GREEN, BLACK);
+                    puts("YOU WON"); 
+                    set_cursor(14, 37);
+                    set_color(WHITE, BLACK);
+                    puts("Score "); 
+                    set_cursor(14, 42);
+                    set_color(GREEN, BLACK);
+                    put_char(TO_STR(getDestroyedEnemies() & 0xf));
+                    break;
+                }
+                
+                if (enemyC == 15){
                     goingRight = false;
-                    enemyR++;
+                    //enemyR++;
                 }else if(enemyC == 5){
                     goingRight = true;
                     enemyR++;
@@ -52,14 +68,13 @@ int main() {
                             set_color(WHITE, BLACK);
                             puts("Score"); 
                             set_cursor(14, 42);
-                            put_char(TO_STR(score & 0xf));
+                            put_char(TO_STR(getDestroyedEnemies() & 0xf));
                             break;
                         }
                         delay_ms(1500);
+                        clear_screen();
                         enemyR = 10;
                     }
-                            set_cursor(16, 77);
-                            put_char(TO_STR(lives & 0xf));
                 }
 
                 if (goingRight){
@@ -71,8 +86,6 @@ int main() {
                 if (isShooting){
                     if (isPlayerMoving){
                         shootBullet(bulletR--, bulletCBeforeMoving);
-                        set_cursor(16, 70);
-                        put_char(178);
                         if (bulletR == 0){
                             isShooting = false;
                             isBulletGone = true;
@@ -80,8 +93,6 @@ int main() {
                         if (isBulletGone == true){
                             set_cursor(1, bulletCBeforeMoving);
                             put_char(255);
-                            set_cursor(17, 70);
-                            put_char(179);
                         }
                     }
                 }
@@ -102,9 +113,6 @@ int main() {
                     }
                     moveShipRight(r,c);
                 }
-                if (key == 7){
-                    points++;
-                }
                 if (key == 8 && !isShooting){
                     isShooting = true;
                     bulletR = getShipRow()-2;                    
@@ -113,7 +121,7 @@ int main() {
                         isBulletGone = false;
                     }
                 }
-                delay_ms(50);
+                delay_ms(40);
             }
         }
     }
