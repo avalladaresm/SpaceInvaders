@@ -5,21 +5,21 @@
 
 int main() {
     clear_screen();    
-    uint8_t r = 28;
-    uint8_t c = 40;
-    uint8_t enemyR = 3;
-    uint8_t enemyC = 5;
+    uint8_t playerR = 28;
+    uint8_t PlayerC = 40;
+    uint8_t invaderR = 3;
+    uint8_t invaderC = 5;
     uint8_t bulletR = 0;
     uint8_t bulletCBeforeMoving = 0;
     uint8_t lives = 2;
     uint8_t score = 0;
-    bool goingRight = true;
+    bool isGoingRight = true;
     bool isShooting = false;
     bool isPlayerMoving = false;
     bool isBulletGone = true;
 
     keypad_init();
-    menu();
+    displayMenu();
     while (1) {
         uint8_t k = keypad_getkey();
         if(k==7){
@@ -42,7 +42,7 @@ int main() {
                     set_color(GREEN, BLACK);
                     puts("YOU WON"); 
                     set_cursor(14, 37);
-                    set_color(WHITE, BLACK);
+                    set_color(BRIGHT_WHITE, BLACK);
                     puts("Score "); 
                     set_cursor(14, 42);
                     set_color(GREEN, BLACK);
@@ -50,13 +50,12 @@ int main() {
                     break;
                 }
                 
-                if (enemyC == 15){
-                    goingRight = false;
-                    //enemyR++;
-                }else if(enemyC == 5){
-                    goingRight = true;
-                    enemyR++;
-                    if (enemyR == 24){
+                if (invaderC == 15){
+                    isGoingRight = false;
+                }else if(invaderC == 5){
+                    isGoingRight = true;
+                    invaderR++;
+                    if (invaderR == 24){
                         lives--;
                         if (lives == 0){
                             delay_ms(500);
@@ -65,7 +64,7 @@ int main() {
                             set_color(RED, BLACK);
                             puts("Game over"); 
                             set_cursor(14, 36);
-                            set_color(WHITE, BLACK);
+                            set_color(BRIGHT_WHITE, BLACK);
                             puts("Score"); 
                             set_cursor(14, 42);
                             put_char(TO_STR(getDestroyedEnemies() & 0xf));
@@ -73,14 +72,14 @@ int main() {
                         }
                         delay_ms(1500);
                         clear_screen();
-                        enemyR = 10;
+                        invaderR = 10;
                     }
                 }
 
-                if (goingRight){
-                    initSprites(enemyR, enemyC++, goingRight);
+                if (isGoingRight){
+                    displayInvaders(invaderR, invaderC++, isGoingRight);
                 }else{
-                    initSprites(enemyR, enemyC--, goingRight);
+                    displayInvaders(invaderR, invaderC--, isGoingRight);
                 }
 
                 if (isShooting){
@@ -99,24 +98,24 @@ int main() {
 
                 if (key == 1){
                     isPlayerMoving = true;
-                    c-=2;
-                    if (c == 2){
-                        c+=2;
+                    PlayerC-=2;
+                    if (PlayerC == 2){
+                        PlayerC+=2;
                     }
-                    moveShipLeft(r,c);
+                    movePlayerLeft(playerR,PlayerC);
                 }
                 if (key == 2){
                     isPlayerMoving = true;
-                    c+=2;
-                    if (c == 74){
-                        c-=2;
+                    PlayerC+=2;
+                    if (PlayerC == 74){
+                        PlayerC-=2;
                     }
-                    moveShipRight(r,c);
+                    movePlayerRight(playerR,PlayerC);
                 }
                 if (key == 8 && !isShooting){
                     isShooting = true;
-                    bulletR = getShipRow()-2;                    
-                    bulletCBeforeMoving = getShipCol()+1;
+                    bulletR = getPlayerRow()-2;                    
+                    bulletCBeforeMoving = getPlayerCol()+1;
                     if (isBulletGone){
                         isBulletGone = false;
                     }

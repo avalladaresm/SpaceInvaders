@@ -34,22 +34,20 @@ void put_char(uint8_t ch);
 void puts(const char *message);
 void clear_screen();
 
-void menu();
-void displayTest();
-void initSprites(uint8_t row, uint8_t col, bool goingRight);
-void moveShipRight(uint8_t row, uint8_t col);
-void moveShipLeft(uint8_t row, uint8_t col);
+void displayMenu();
+void movePlayerRight(uint8_t row, uint8_t col);
+void movePlayerLeft(uint8_t row, uint8_t col);
+void setPlayerPosition(uint8_t row, uint8_t col);
+uint8_t getPlayerRow();
+uint8_t getPlayerCol();
+void displayInvaders(uint8_t row, uint8_t col, bool isGoingRight);
 void shootBullet(uint8_t row, uint8_t col);
-void setShipPosition(uint8_t row, uint8_t col);
-uint8_t getShipRow();
-uint8_t getShipCol();
 void setBulletPosition(uint8_t row, uint8_t col);
 uint8_t getBulletRow();
 uint8_t getBulletCol();
-
-void displayLives(uint8_t lives);
-void displayScore(uint8_t score);
 uint8_t getDestroyedEnemies();
+void displayScore(uint8_t score);
+void displayLives(uint8_t lives);
 
 #endif
 

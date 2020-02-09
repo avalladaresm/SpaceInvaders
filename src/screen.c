@@ -9,15 +9,15 @@ struct Player{
     char *sprites;
 } player;
 
-struct Enemy1{
+struct Invader{
     uint8_t row;
     uint8_t col;
     bool isDestroyed;
     char *sprites;
 }; 
-struct Enemy1 enemy1[5];
-struct Enemy1 enemy2[5];
-struct Enemy1 enemy3[5];
+struct Invader invader1[5];
+struct Invader invader2[5];
+struct Invader invader3[5];
 
 struct Bullet{
     uint8_t row;
@@ -25,21 +25,10 @@ struct Bullet{
     char *sprite;
 } bullet;
 
-struct shipPosition{
-    uint8_t row;
-    uint8_t col;
-};
-
-struct bulletPosition{
-    uint8_t row;
-    uint8_t col;
-    bool ifImpact;
-};
-
-void menu(){
+void displayMenu(){
     uint8_t f, b;
     get_color(&f, &b);
-    set_color(WHITE, BLACK);
+    set_color(BRIGHT_WHITE, BLACK);
     set_cursor(10, 32);
     puts("SPACE INVADERS");
     set_cursor(13, 31);
@@ -48,14 +37,14 @@ void menu(){
     puts("By: Alejandro Valladares");
 }
 
-void moveShipRight(uint8_t row, uint8_t col){
+void movePlayerRight(uint8_t row, uint8_t col){
     player.row = row;
     player.col = col;
     player.sprites = "\x2\x3\x4";
     uint8_t f, b;
     get_color(&f, &b);
 
-    set_color(GREEN, BLACK);
+    set_color(LIGHT_GREEN, BLACK);
     set_cursor(player.row, player.col);
     puts(player.sprites);
     set_cursor(player.row, player.col-1);
@@ -63,17 +52,17 @@ void moveShipRight(uint8_t row, uint8_t col){
     set_cursor(player.row, player.col-2);
     put_char(255);
     set_color(f, b);
-    setShipPosition(player.row, player.col);
+    setPlayerPosition(player.row, player.col);
 }
 
-void moveShipLeft(uint8_t row, uint8_t col){
+void movePlayerLeft(uint8_t row, uint8_t col){
     player.row = row;
     player.col = col;
     player.sprites = "\x2\x3\x4";
     uint8_t f, b;
     get_color(&f, &b);
 
-    set_color(GREEN, BLACK);
+    set_color(LIGHT_GREEN, BLACK);
     set_cursor(player.row, player.col);
     puts(player.sprites);
     set_cursor(player.row, player.col+3);
@@ -81,143 +70,158 @@ void moveShipLeft(uint8_t row, uint8_t col){
     set_cursor(player.row, player.col+4);
     put_char(255);
     set_color(f, b);
-    setShipPosition(player.row, player.col);
+    setPlayerPosition(player.row, player.col);
 }
 
-void initSprites(uint8_t row, uint8_t col, bool goingRight){
+void setPlayerPosition(uint8_t row, uint8_t col){
+    player.row = row;
+    player.col = col;
+}
+
+uint8_t getPlayerRow(){
+    return player.row;
+}
+
+uint8_t getPlayerCol(){
+    return player.col;
+}
+
+void displayInvaders(uint8_t row, uint8_t col, bool isGoingRight){
     uint8_t basePositions1[] = {col, col+12, col+24, col+36, col+48};
     uint8_t basePositions2[] = {col+4, col+16, col+28, col+40, col+52};
     uint8_t basePositions3[] = {col+8, col+20, col+32, col+44, col+56};
 
     for (uint8_t i = 0; i < 5; i++){
-        enemy1[i].row = row;
-        enemy1[i].col = basePositions1[i];
-        if (enemy1[i].isDestroyed){
-            enemy1[i].sprites = "\xff\xff\xff";
+        invader1[i].row = row;
+        invader1[i].col = basePositions1[i];
+        if (invader1[i].isDestroyed){
+            invader1[i].sprites = "\xff\xff\xff";
         } else{
-            enemy1[i].sprites = "\x5\x6\x7";
+            invader1[i].sprites = "\x5\x6\x7";
         }
 
-        enemy2[i].row = row+2;
-        enemy2[i].col = basePositions2[i];
-        if (enemy2[i].isDestroyed){
-            enemy2[i].sprites = "\xff\xff\xff";
+        invader2[i].row = row+2;
+        invader2[i].col = basePositions2[i];
+        if (invader2[i].isDestroyed){
+            invader2[i].sprites = "\xff\xff\xff";
         } else{
-            enemy2[i].sprites = "\x19\xb\xc";
+            invader2[i].sprites = "\x19\xb\xc";
         }
 
-        enemy3[i].col = basePositions3[i];
-        enemy3[i].row = row+4;
-        if (enemy3[i].isDestroyed){
-            enemy3[i].sprites = "\xff\xff\xff";
+        invader3[i].col = basePositions3[i];
+        invader3[i].row = row+4;
+        if (invader3[i].isDestroyed){
+            invader3[i].sprites = "\xff\xff\xff";
         } else{
-            enemy3[i].sprites = "\x10\x11\x12";
+            invader3[i].sprites = "\x10\x11\x12";
         }
     }
     uint8_t f, b;
     get_color(&f, &b);
 
     for (uint8_t i = 0; i < 5; i++){
-        if (goingRight){
-            set_color(WHITE, BLACK);
-            
-            set_cursor(enemy1[i].row, enemy1[i].col-1);
+        if (isGoingRight){
+            set_color(CYAN, BLACK);
+            set_cursor(invader1[i].row, invader1[i].col-1);
             put_char(255);
-            set_cursor(enemy1[i].row, enemy1[i].col);
-            puts(enemy1[i].sprites);
+            set_cursor(invader1[i].row, invader1[i].col);
+            puts(invader1[i].sprites);
 
-            set_cursor(enemy2[i].row, enemy2[i].col-1);
+            set_color(BROWN, BLACK);
+            set_cursor(invader2[i].row, invader2[i].col-1);
             put_char(255);
-            set_cursor(enemy2[i].row, enemy2[i].col);
-            puts(enemy2[i].sprites);
+            set_cursor(invader2[i].row, invader2[i].col);
+            puts(invader2[i].sprites);
 
-            set_cursor(enemy3[i].row, enemy3[i].col-1);
+            set_color(MAGENTA, BLACK);
+            set_cursor(invader3[i].row, invader3[i].col-1);
             put_char(255);
-            set_cursor(enemy3[i].row, enemy3[i].col);
-            puts(enemy3[i].sprites);
+            set_cursor(invader3[i].row, invader3[i].col);
+            puts(invader3[i].sprites);
 
             for (uint8_t j = 0; j < 5; j++){
-                if (enemy1[j].col == 5 || enemy1[j].col == col + 5){
-                    set_cursor(enemy1[i].row-1, enemy1[i].col+1);
+                if (invader1[j].col == 5 || invader1[j].col == col + 5){
+                    set_cursor(invader1[i].row-1, invader1[i].col+1);
                     puts("\xff\xff\xff");
-                    set_cursor(enemy2[i].row-1, enemy2[i].col+1);
+                    set_cursor(invader2[i].row-1, invader2[i].col+1);
                     puts("\xff\xff\xff");
-                    set_cursor(enemy3[i].row-1, enemy3[i].col+1);
+                    set_cursor(invader3[i].row-1, invader3[i].col+1);
                     puts("\xff\xff\xff");
                 }
             }
-            if ((enemy1[i].row == getBulletRow() && 
-                (enemy1[i].col == getBulletCol() || 
-                enemy1[i].col+1 == getBulletCol() ||
-                enemy1[i].col+2 == getBulletCol()))){
-                    enemy1[i].isDestroyed = true;
-                    enemy1[i].sprites = "\xff\xff\xff";
+            if ((invader1[i].row == getBulletRow() && 
+                (invader1[i].col == getBulletCol() || 
+                invader1[i].col+1 == getBulletCol() ||
+                invader1[i].col+2 == getBulletCol()))){
+                    invader1[i].isDestroyed = true;
+                    invader1[i].sprites = "\xff\xff\xff";
             }
-            if ((enemy2[i].row == getBulletRow() && 
-                (enemy2[i].col == getBulletCol() || 
-                enemy2[i].col+1 == getBulletCol() ||
-                enemy2[i].col+2 == getBulletCol()))){
-                    enemy2[i].isDestroyed = true;
-                    enemy2[i].sprites = "\xff\xff\xff";
+            if ((invader2[i].row == getBulletRow() && 
+                (invader2[i].col == getBulletCol() || 
+                invader2[i].col+1 == getBulletCol() ||
+                invader2[i].col+2 == getBulletCol()))){
+                    invader2[i].isDestroyed = true;
+                    invader2[i].sprites = "\xff\xff\xff";
             }
-            if ((enemy3[i].row == getBulletRow() && 
-                (enemy3[i].col == getBulletCol() || 
-                enemy3[i].col+1 == getBulletCol() ||
-                enemy3[i].col+2 == getBulletCol()))){
-                    enemy3[i].isDestroyed = true;
-                    enemy3[i].sprites = "\xff\xff\xff";
+            if ((invader3[i].row == getBulletRow() && 
+                (invader3[i].col == getBulletCol() || 
+                invader3[i].col+1 == getBulletCol() ||
+                invader3[i].col+2 == getBulletCol()))){
+                    invader3[i].isDestroyed = true;
+                    invader3[i].sprites = "\xff\xff\xff";
             }
         }
         else{
-            set_color(WHITE, BLACK);
-            
-            set_cursor(enemy1[i].row, enemy1[i].col+3);
+            set_color(CYAN, BLACK);
+            set_cursor(invader1[i].row, invader1[i].col+3);
             put_char(255);
-            set_cursor(enemy1[i].row, enemy1[i].col);
-            puts(enemy1[i].sprites);
+            set_cursor(invader1[i].row, invader1[i].col);
+            puts(invader1[i].sprites);
 
-            set_cursor(enemy2[i].row, enemy2[i].col+3);
+            set_color(BROWN, BLACK);
+            set_cursor(invader2[i].row, invader2[i].col+3);
             put_char(255);
-            set_cursor(enemy2[i].row, enemy2[i].col);
-            puts(enemy2[i].sprites);
+            set_cursor(invader2[i].row, invader2[i].col);
+            puts(invader2[i].sprites);
 
-            set_cursor(enemy3[i].row, enemy3[i].col+3);
+            set_color(MAGENTA, BLACK);
+            set_cursor(invader3[i].row, invader3[i].col+3);
             put_char(255);
-            set_cursor(enemy3[i].row, enemy3[i].col);
-            puts(enemy3[i].sprites);
+            set_cursor(invader3[i].row, invader3[i].col);
+            puts(invader3[i].sprites);
 
             for (uint8_t j = 0; j < 5; j++){
-                if (enemy1[j].col == 15 || enemy1[j].col == col + 5){
-                    set_cursor(enemy1[i].row, enemy1[i].col-3);
+                if (invader1[j].col == 15 || invader1[j].col == col + 5){
+                    set_cursor(invader1[i].row, invader1[i].col-3);
                     puts("\xff\xff\xff");
-                    set_cursor(enemy2[i].row, enemy2[i].col-3);
+                    set_cursor(invader2[i].row, invader2[i].col-3);
                     puts("\xff\xff\xff");
-                    set_cursor(enemy3[i].row, enemy3[i].col-3);
+                    set_cursor(invader3[i].row, invader3[i].col-3);
                     puts("\xff\xff\xff");
                 }
             }
-            if ((enemy1[i].row == getBulletRow() && 
-                (enemy1[i].col == getBulletCol() || 
-                enemy1[i].col+1 == getBulletCol() ||
-                enemy1[i].col+2 == getBulletCol()))){
-                    enemy1[i].sprites = "\x1a\x1b\x1c";
-                    enemy1[i].isDestroyed = true;
-                    enemy1[i].sprites = "\xff\xff\xff";
+            if ((invader1[i].row == getBulletRow() && 
+                (invader1[i].col == getBulletCol() || 
+                invader1[i].col+1 == getBulletCol() ||
+                invader1[i].col+2 == getBulletCol()))){
+                    invader1[i].sprites = "\x1a\x1b\x1c";
+                    invader1[i].isDestroyed = true;
+                    invader1[i].sprites = "\xff\xff\xff";
             }
-            if ((enemy2[i].row == getBulletRow() && 
-                (enemy2[i].col == getBulletCol() || 
-                enemy2[i].col+1 == getBulletCol() ||
-                enemy2[i].col+2 == getBulletCol()))){
-                    enemy2[i].isDestroyed = true;
-                    enemy2[i].sprites = "\xff\xff\xff";
+            if ((invader2[i].row == getBulletRow() && 
+                (invader2[i].col == getBulletCol() || 
+                invader2[i].col+1 == getBulletCol() ||
+                invader2[i].col+2 == getBulletCol()))){
+                    invader2[i].isDestroyed = true;
+                    invader2[i].sprites = "\xff\xff\xff";
             }
-            if ((enemy3[i].row == getBulletRow() && 
-                (enemy3[i].col == getBulletCol() || 
-                enemy3[i].col+1 == getBulletCol() ||
-                enemy3[i].col+2 == getBulletCol()))){
-                    enemy1[i].sprites = "\x1a\x1b\x1c";
-                    enemy3[i].isDestroyed = true;
-                    enemy3[i].sprites = "\xff\xff\xff";
+            if ((invader3[i].row == getBulletRow() && 
+                (invader3[i].col == getBulletCol() || 
+                invader3[i].col+1 == getBulletCol() ||
+                invader3[i].col+2 == getBulletCol()))){
+                    invader1[i].sprites = "\x1a\x1b\x1c";
+                    invader3[i].isDestroyed = true;
+                    invader3[i].sprites = "\xff\xff\xff";
             }
         }
     }
@@ -240,19 +244,6 @@ void shootBullet(uint8_t row, uint8_t col){
     setBulletPosition(bullet.row, bullet.col);
 }
 
-void setShipPosition(uint8_t row, uint8_t col){
-    player.row = row;
-    player.col = col;
-}
-
-uint8_t getShipRow(){
-    return player.row;
-}
-
-uint8_t getShipCol(){
-    return player.col;
-}
-
 void setBulletPosition(uint8_t row, uint8_t col){
     bullet.row = row;
     bullet.col = col;
@@ -269,40 +260,40 @@ uint8_t getBulletCol(){
 uint8_t getDestroyedEnemies(){
     int destroyedEnemies = 0;
     for (uint8_t i = 0; i < 5; i++){
-        if (enemy1[i].isDestroyed == true){
+        if (invader1[i].isDestroyed == true){
             destroyedEnemies++;
         }
-        if (enemy2[i].isDestroyed == true){
+        if (invader2[i].isDestroyed == true){
             destroyedEnemies++;
         }
-        if (enemy3[i].isDestroyed == true){
+        if (invader3[i].isDestroyed == true){
             destroyedEnemies++;
         }
     }
-    
+
     return destroyedEnemies;
 }
 
 void displayScore(uint8_t score){
     set_cursor(1, 1);
-    set_color(WHITE, BLACK);
+    set_color(BRIGHT_WHITE, BLACK);
     puts("Score");
     uint8_t f, b;
     get_color(&f, &b);
     
-    set_color(GREEN, BLACK);
+    set_color(LIGHT_GREEN, BLACK);
     set_cursor(1, 7);
     put_char(TO_STR(score & 0xf));
 }
 
 void displayLives(uint8_t lives){
     set_cursor(1, 60);
-    set_color(WHITE, BLACK);
+    set_color(BRIGHT_WHITE, BLACK);
     puts("Lives");
     uint8_t f, b;
     get_color(&f, &b);
     
-    set_color(GREEN, BLACK);
+    set_color(LIGHT_GREEN, BLACK);
     if (lives == 2) {
         set_cursor(1, 66);
         puts("\x2\x3\x4");
