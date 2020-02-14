@@ -1,0 +1,15 @@
+1520 displayInvaders
+952 main
+248 displayLives
+176 movePlayerRight
+176 movePlayerLeft
+156 shootBullet
+128 displayScore
+116 displayMenu
+104 getDestroyedEnemies
+20 setPlayerPosition
+20 setBulletPosition
+12 getPlayerRow
+12 getPlayerCol
+12 getBulletRow
+12 getBulletCol

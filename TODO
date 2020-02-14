@@ -1,0 +1,10 @@
+Feedback
+Juego completo.
+
+TODO
+
+El archivo functions.txt contiene todas las funciones
+de su proyecto con una puntuacion asignada. Elija las funciones que 
+usted quiera para implementarlas en ensamblador con el requisito de 
+que al sumar la puntuacion de todas las funciones implementadas en
+ensamblador debera ser por lo menos 1000
