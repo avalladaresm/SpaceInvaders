@@ -48,6 +48,7 @@ uint8_t getBulletCol();
 uint8_t getDestroyedEnemies();
 void displayScore(uint8_t score);
 void displayLives(uint8_t lives);
+char TO_STR(int ch);
 
 #endif
 

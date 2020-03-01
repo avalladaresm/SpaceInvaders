@@ -1,6 +1,15 @@
 #include "../include/screen.h"
 
-#define TO_STR(ch) ( ( ((ch) >= 0 ) && ((ch) <= 9) )? (48 + (ch)) : ('a' + ((ch) - 10)) )
+//#define TO_STR(ch) ( ( ((ch) >= 0 ) && ((ch) <= 9) )? (48 + (ch)) : ('a' + ((ch) - 10)) )
+
+char TO_STR(int ch){
+    if(ch >= 0  && ch <= 9){
+        return (48 + (ch));
+    }
+    else {
+        return ('a' + ((ch) - 10));
+    }
+}
 
 struct Player{
     uint8_t row;
@@ -25,17 +34,17 @@ struct Bullet{
     char *sprite;
 } bullet;
 
-void displayMenu(){
-    uint8_t f, b;
-    get_color(&f, &b);
-    set_color(BRIGHT_WHITE, BLACK);
-    set_cursor(10, 32);
-    puts("SPACE INVADERS");
-    set_cursor(13, 31);
-    puts("Press p to play");
-    set_cursor(29, 55);
-    puts("By: Alejandro Valladares");
-}
+// void displayMenu(){
+//     uint8_t f, b;
+//     get_color(&f, &b);
+//     set_color(BRIGHT_WHITE, BLACK);
+//     set_cursor(10, 32);
+//     puts("SPACE INVADERS");
+//     set_cursor(13, 31);
+//     puts("Press p to play");
+//     set_cursor(29, 55);
+//     puts("By: Alejandro Valladares");
+// }
 
 void movePlayerRight(uint8_t row, uint8_t col){
     player.row = row;
@@ -73,18 +82,18 @@ void movePlayerLeft(uint8_t row, uint8_t col){
     setPlayerPosition(player.row, player.col);
 }
 
-void setPlayerPosition(uint8_t row, uint8_t col){
-    player.row = row;
-    player.col = col;
-}
+// void setPlayerPosition(uint8_t row, uint8_t col){
+//     player.row = row;
+//     player.col = col;
+// }
 
-uint8_t getPlayerRow(){
-    return player.row;
-}
+// uint8_t getPlayerRow(){
+//     return player.row;
+// }
 
-uint8_t getPlayerCol(){
-    return player.col;
-}
+// uint8_t getPlayerCol(){
+//     return player.col;
+// }
 
 void displayInvaders(uint8_t row, uint8_t col, bool isGoingRight){
     uint8_t basePositions1[] = {col, col+12, col+24, col+36, col+48};
@@ -228,34 +237,31 @@ void displayInvaders(uint8_t row, uint8_t col, bool isGoingRight){
     set_color(f, b);
 }
 
-void shootBullet(uint8_t row, uint8_t col){
-    bullet.row = row;
-    bullet.col = col;
-    bullet.sprite = "\x1";
-    uint8_t f, b;
-    get_color(&f, &b);
+// void shootBullet(uint8_t row, uint8_t col){
+//     bullet.row = row;
+//     bullet.col = col;
+//     bullet.sprite = "\x1";
 
-    set_color(YELLOW, BLACK);
-    set_cursor(bullet.row--, bullet.col);
-    puts(bullet.sprite);
-    set_cursor(bullet.row+2, bullet.col);
-    put_char(255);
-    set_color(f, b);
-    setBulletPosition(bullet.row, bullet.col);
-}
+//     set_color(YELLOW, BLACK);
+//     set_cursor(bullet.row--, bullet.col);
+//     puts(bullet.sprite);
+//     set_cursor(bullet.row+2, bullet.col);
+//     put_char(255);
+//     setBulletPosition(bullet.row, bullet.col);
+// }
 
-void setBulletPosition(uint8_t row, uint8_t col){
-    bullet.row = row;
-    bullet.col = col;
-}
+// void setBulletPosition(uint8_t row, uint8_t col){
+//     bullet.row = row;
+//     bullet.col = col;
+// }
 
-uint8_t getBulletRow(){
-    return bullet.row;
-}
+// uint8_t getBulletRow(){
+//     return bullet.row;
+// }
 
-uint8_t getBulletCol(){
-    return bullet.col;
-}
+// uint8_t getBulletCol(){
+//     return bullet.col;
+// }
 
 uint8_t getDestroyedEnemies(){
     int destroyedEnemies = 0;
@@ -274,40 +280,38 @@ uint8_t getDestroyedEnemies(){
     return destroyedEnemies;
 }
 
-void displayScore(uint8_t score){
-    set_cursor(1, 1);
-    set_color(BRIGHT_WHITE, BLACK);
-    puts("Score");
-    uint8_t f, b;
-    get_color(&f, &b);
+// void displayScore(uint8_t score){
+//     set_cursor(1, 1);
+//     set_color(BRIGHT_WHITE, BLACK);
+//     puts("Score");
+//     uint8_t f, b;
+//     get_color(&f, &b);
     
-    set_color(LIGHT_GREEN, BLACK);
-    set_cursor(1, 7);
-    put_char(TO_STR(score & 0xf));
-}
+//     set_color(LIGHT_GREEN, BLACK);
+//     set_cursor(1, 7);
+//     put_char(TO_STR(score & 0xf));
+// }
 
-void displayLives(uint8_t lives){
-    set_cursor(1, 60);
-    set_color(BRIGHT_WHITE, BLACK);
-    puts("Lives");
-    uint8_t f, b;
-    get_color(&f, &b);
+// void displayLives(uint8_t lives){
+//     set_cursor(1, 60);
+//     set_color(BRIGHT_WHITE, BLACK);
+//     puts("Lives");
     
-    set_color(LIGHT_GREEN, BLACK);
-    if (lives == 2) {
-        set_cursor(1, 66);
-        puts("\x2\x3\x4");
-        set_cursor(1, 70);
-        puts("\x2\x3\x4");
-    } else if(lives == 1){
-        set_cursor(1, 66);
-        puts("\x2\x3\x4");
-        set_cursor(1, 70);
-        puts("\xff\xff\xff");
-    } else if(lives == 0){
-        set_cursor(1, 66);
-        puts("\xff\xff\xff");
-        set_cursor(1, 70);
-        puts("\xff\xff\xff");
-    }
-}
+//     set_color(LIGHT_GREEN, BLACK);
+//     if (lives == 2) {
+//         set_cursor(1, 66);
+//         puts("\x2\x3\x4");
+//         set_cursor(1, 70);
+//         puts("\x2\x3\x4");
+//     } else if(lives == 1){
+//         set_cursor(1, 66);
+//         puts("\x2\x3\x4");
+//         set_cursor(1, 70);
+//         puts("\xff\xff\xff");
+//     } else if(lives == 0){
+//         set_cursor(1, 66);
+//         puts("\xff\xff\xff");
+//         set_cursor(1, 70);
+//         puts("\xff\xff\xff");
+//     }
+// }

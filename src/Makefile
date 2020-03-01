@@ -1,6 +1,6 @@
 TARGET=screen.elf
 C_SOURCES=main.c screen.c
-ASM_SOURCES=start.S
+ASM_SOURCES=start.S displayMenu.S displayLives.S displayScore.S getPlayerRow.S getPlayerCol.S getBulletRow.S getBulletCol.S setBulletPosition.S setPlayerPosition.S shootBullet.S
 ASM_OUTPUT=$(TARGET).s
 ASMGEN_SOURCES=$(C_SOURCES:.c=.S)
 OBJ_FILES=$(ASM_SOURCES:.S=.o) $(ASMGEN_SOURCES:.S=.o) ../lib/libtinymips.a
